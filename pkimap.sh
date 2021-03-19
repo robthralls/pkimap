@@ -42,6 +42,10 @@ main () {
       p7c_file="${work_dir}/$(printf "%s\n" "${line}" | sha 1).p7c"
       if [ ! -f "${p7c_file}" ]; then
         curl -s --connect-timeout 5 --max-time 10 "${line}" -o "${p7c_file}"
+        if grep -q href "${p7c_file}"; then
+          line="$(grep -Eoi '<a [^>]+>' "${p7c_file}" | grep -Eo 'href="[^\"]+"' | grep -Eo '(http|https)://.*[^/"]+')"
+          curl -s --connect-timeout 5 --max-time 10 "${line}" -o "${p7c_file}"
+        fi
       fi
     done < "${p7c_list}"
     rm "${p7c_list}"
